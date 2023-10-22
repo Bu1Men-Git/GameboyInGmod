@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import Gameboy from 'serverboy';
 import { WebSocketServer } from 'ws';
-const wss = new WebSocketServer({ port: 6969 });
+const wss = new WebSocketServer({ port: 1234 });
 const buttons = [
     { "A": Gameboy.KEYMAP.A },
     { "B": Gameboy.KEYMAP.B },
@@ -46,14 +46,17 @@ wss.on('connection', async function connection(ws) {
         if (dat.length < 4)
             gb.pressKey(buttons[dat]);
         else {
-            switch (dat.substring(0, 3)) {
+            switch (dat.substring(0, 4)) {
                 case 'save':
                     var str = 'save' + gb.getSaveData();
                     ws.send(str);
                     break;
                 case 'load':
                     var strs = dat.split('|');
-                    loadGame(gb, Number.parseInt(strs[1]), strs[2]);
+                    if (strs.length > 2)
+                        loadGame(gb, Number.parseInt(strs[1]), strs[2]);
+                    else
+                        loadGame(gb, Number.parseInt(strs[1]));
                     ready = true;
                     break;
             }

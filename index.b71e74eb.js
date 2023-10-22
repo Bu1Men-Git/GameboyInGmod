@@ -582,18 +582,34 @@ var _serverboyDefault = parcelHelpers.interopDefault(_serverboy);
 var _ws = require("ws");
 var Buffer = require("c4205b559d02a15e").Buffer;
 const wss = new (0, _ws.WebSocketServer)({
-    port: 6969
+    port: 1234
 });
-const buttons = {
-    "A": (0, _serverboyDefault.default).KEYMAP.A,
-    "B": (0, _serverboyDefault.default).KEYMAP.B,
-    "R": (0, _serverboyDefault.default).KEYMAP.RIGHT,
-    "L": (0, _serverboyDefault.default).KEYMAP.LEFT,
-    "U": (0, _serverboyDefault.default).KEYMAP.DOWN,
-    "D": (0, _serverboyDefault.default).KEYMAP.UP,
-    "SL": (0, _serverboyDefault.default).KEYMAP.SELECT,
-    "ST": (0, _serverboyDefault.default).KEYMAP.START
-};
+const buttons = [
+    {
+        "A": (0, _serverboyDefault.default).KEYMAP.A
+    },
+    {
+        "B": (0, _serverboyDefault.default).KEYMAP.B
+    },
+    {
+        "R": (0, _serverboyDefault.default).KEYMAP.RIGHT
+    },
+    {
+        "L": (0, _serverboyDefault.default).KEYMAP.LEFT
+    },
+    {
+        "U": (0, _serverboyDefault.default).KEYMAP.DOWN
+    },
+    {
+        "D": (0, _serverboyDefault.default).KEYMAP.UP
+    },
+    {
+        "SL": (0, _serverboyDefault.default).KEYMAP.SELECT
+    },
+    {
+        "ST": (0, _serverboyDefault.default).KEYMAP.START
+    }
+];
 const roms = [
     "pokemon_emerald.gba",
     "pokemon_crystal.gbc",
@@ -621,15 +637,17 @@ wss.on("connection", async function connection(ws) {
     }, 1000 / 30);
     ws.on("message", (data)=>{
         var dat = data.toString();
+        console.log(dat);
         if (dat.length < 4) gb.pressKey(buttons[dat]);
-        else switch(dat.substring(0, 3)){
+        else switch(dat.substring(0, 4)){
             case "save":
                 var str = "save" + gb.getSaveData();
                 ws.send(str);
                 break;
             case "load":
                 var strs = dat.split("|");
-                loadGame(gb, Number.parseInt(strs[1]), strs[2]);
+                if (strs.length > 2) loadGame(gb, Number.parseInt(strs[1]), strs[2]);
+                else loadGame(gb, Number.parseInt(strs[1]));
                 ready = true;
                 break;
         }
